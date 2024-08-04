@@ -4,7 +4,7 @@ FROM python:3.10
 WORKDIR /app
 
 COPY ./requirements.txt .
-COPY ./setup.sh .
+COPY ./load_model.sh .
 COPY ./config.py .
 COPY ./app.py .
 

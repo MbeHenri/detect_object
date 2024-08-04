@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  frontend:
+    image: terra1313/detector:frontend-v1
+    container_name: frontend
+    ports:
+      - "3000:80"
+    environment:
+      - REACT_APP_API_HOST=backend
+      - REACT_APP_API_PORT=8000
+      - REACT_APP_API_NOT_SECURE=true
+    depends_on:
+      - backend
+
+  backend:
+    image: terra1313/detector:backend-v1
+    container_name: backend
+    ports:
+      - "8000:8090"
+    environment:
+      - FRONTEND_HOST=frontend
+      - FRONTEND_PORT=3000
+    volumes:
+      - ./detect-object-api:/app
+    command: uvicorn app:app --host 0.0.0.0 --port 8090
+
+networks:
+  default:
+    driver: bridge
+

@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-deployment
+  namespace: detect-object
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: api
+  template:
+    metadata:
+      labels:
+        app: api
+    spec:
+      containers:
+        - name: api-container
+          image: terra1313/detector:backend-v1
+          ports:
+            - containerPort: 8000
+          env:
+            - name: FRONTEND_HOST
+              value: "frontend-service"
+            - name: FRONTEND_PORT
+              value: "80"
+
