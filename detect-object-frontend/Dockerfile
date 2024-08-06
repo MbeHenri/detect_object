@@ -1,39 +1,28 @@
-# Stufe 1: Build-Stufe
-FROM node:16 AS build
+FROM node:18-alpine AS builder
 
-# Arbeitsverzeichnis festlegen
+ENV NODE_ENV production
 WORKDIR /app
 
-# Package.json und yarn.lock kopieren
-COPY package*.json yarn.lock ./
+COPY package*.json .
 
-# Abhängigkeiten installieren
-RUN yarn install
+RUN npm install
 
-# Den gesamten Code kopieren
 COPY . .
 
-# Build-Prozess starten
-RUN yarn build
+RUN npm run build
 
-# Stufe 2: Production-Stufe
-FROM nginx:alpine
+FROM nginx
 
-# Arbeitsverzeichnis für Nginx konfigurieren
-WORKDIR /usr/share/nginx/html
+COPY --from=builder /app/build /usr/share/nginx/html
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-# Standard Nginx static assets entfernen
-RUN rm -rf ./*
+# handle the future env variable begining by REACT_APP_API_ specify as value of real env variable 
+COPY env.sh /docker-entrypoint.d/env.sh
+RUN chmod +x /docker-entrypoint.d/env.sh
 
-# Vom vorherigen Build den erstellten Code kopieren
-COPY --from=build /app/build .
+EXPOSE 80 443
 
-# Nginx-Konfiguration kopieren (optional, falls nötig)
-# COPY nginx.conf /etc/nginx/nginx.conf
+# Start the app
+# CMD [ "npm", "start" ]
 
-# Exponieren des Ports
-EXPOSE 80
-
-# Nginx starten
-CMD ["nginx", "-g", "daemon off;"]
-
+CMD [ "nginx", "-g", "daemon off;" ]

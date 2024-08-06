@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   frontend:
     image: terra1313/detector:frontend-v1
@@ -17,15 +15,9 @@ services:
     image: terra1313/detector:backend-v1
     container_name: backend
     ports:
-      - "8000:8090"
+      - "8000:8000"
     environment:
-      - FRONTEND_HOST=frontend
+      - FRONTEND_HOST=${DOMAIN_NAME:-frontend}
       - FRONTEND_PORT=3000
     volumes:
       - ./detect-object-api:/app
-    command: uvicorn app:app --host 0.0.0.0 --port 8090
-
-networks:
-  default:
-    driver: bridge
-
